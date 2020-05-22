@@ -1,7 +1,9 @@
 import React from "react";
 import { useHistory } from 'react-router-dom'
 
-const push = useHistory()
+import axiosWithAuth from '../utils/axiosWithAuth'; 
+
+
 class Login extends React.Component{
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
@@ -14,7 +16,7 @@ class Login extends React.Component{
         }
     }
   }
-
+  
 
   handleChange = e => {
       this.setState({
@@ -31,7 +33,7 @@ class Login extends React.Component{
         .post('/api/login', this.state.credentials)
         .then(res => {
             localStorage.setItem('token', res.data.payload);
-            push('/protected');
+            useHistory(('/bubbles'));
         })
   }
 
