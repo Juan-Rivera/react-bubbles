@@ -1,15 +1,18 @@
 import React, { useState } from "react";
+import { useParams } from 'react-router-dom'
 import axios from "axios";
+import axiosWithAuth from "../utils/axiosWithAuth";
 
 const initialColor = {
   color: "",
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+const ColorList = (props) => {
+  console.log(props.colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const { id } = useParams();
 
   const editColor = color => {
     setEditing(true);
@@ -18,20 +21,28 @@ const ColorList = ({ colors, updateColors }) => {
 
   const saveEdit = e => {
     e.preventDefault();
-    // Make a put request to save your updated color
-    // think about where will you get the id from...
-    // where is is saved right now?
+    axiosWithAuth()
+    .put(`/api/colors/${id}`, colorToEdit)
+    .then(res => {
+      const updatedColors = props.colors.filter(color => {
+        if(color.id !== id){
+          return color
+        }
+      })
+      props.updateColors([...updatedColors, res.data])
+    })
+    
   };
 
   const deleteColor = color => {
-    // make a delete request to delete this color
+   
   };
 
   return (
     <div className="colors-wrap">
       <p>colors</p>
       <ul>
-        {colors.map(color => (
+        {props.colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
               <span className="delete" onClick={e => {
