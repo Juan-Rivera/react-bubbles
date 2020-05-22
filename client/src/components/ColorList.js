@@ -8,8 +8,8 @@ const initialColor = {
   code: { hex: "" }
 };
 
-const ColorList = (props) => {
-  console.log(props.colors);
+const ColorList = ({colors, updateColors}) => {
+  console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
   const { id } = useParams();
@@ -24,25 +24,34 @@ const ColorList = (props) => {
     axiosWithAuth()
     .put(`/api/colors/${id}`, colorToEdit)
     .then(res => {
-      const updatedColors = props.colors.filter(color => {
-        if(color.id !== id){
+      const updatedColors = colors.filter(color => {
+        if(color.id !== colorToEdit.id){
           return color
         }
       })
-      props.updateColors([...updatedColors, res.data])
+      updateColors([...updatedColors, res.data])
     })
     
   };
 
   const deleteColor = color => {
-   
+    axiosWithAuth()
+    .delete(`/api/colors/${color.id}`)
+      .then(res => {
+        const undeletedColors = colors.filter(color => {
+          if(color.id !== res.data){
+            return color
+          }
+        })
+        updateColors(undeletedColors);
+      })
   };
 
   return (
     <div className="colors-wrap">
       <p>colors</p>
       <ul>
-        {props.colors.map(color => (
+        {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
               <span className="delete" onClick={e => {
